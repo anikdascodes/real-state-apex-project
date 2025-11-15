@@ -13,6 +13,10 @@ automation/
 │   └── demo.sh                       # Interactive demo script
 ├── notebook_execution/                # Notebook execution utilities
 │   └── execute_notebook.py           # Execute notebooks with output capture
+├── pdf_export/                        # PDF generation from notebooks
+│   ├── notebook_to_html_pdf.py       # HTML-based PDF generator
+│   ├── notebook_to_pdf.py            # LaTeX-based PDF generator
+│   └── README.md                     # PDF export documentation
 └── docs/                             # Additional documentation
     ├── QUICK_START.md                # Quick reference guide
     ├── API_REFERENCE.md              # Complete API documentation
@@ -48,7 +52,45 @@ python automation/notebook_execution/execute_notebook.py notebook.ipynb output.i
 
 ## 📚 Available Tools
 
-### 1. Notebook Controller
+### 1. PDF Export (NEW!)
+
+**Location**: `automation/pdf_export/notebook_to_html_pdf.py`
+
+**Purpose**: Convert Jupyter notebooks to professional PDF documents with all outputs, images, and analysis
+
+**Features**:
+- ✅ Extract all markdown, code, and outputs
+- ✅ Embed all images (plots, charts, graphs)
+- ✅ Professional styling with CSS
+- ✅ No LaTeX required (uses weasyprint)
+- ✅ Single command execution
+- ✅ 1.3 MB PDF from 81-cell notebook in ~10 seconds
+
+**Quick Usage**:
+
+```bash
+# Generate PDF report
+python automation/pdf_export/notebook_to_html_pdf.py \
+    notebooks/Ames_Housing_Price_Prediction_EXECUTED.ipynb \
+    reports/Analysis_Report.pdf
+
+# With our project notebook
+python automation/pdf_export/notebook_to_html_pdf.py \
+    notebooks/Ames_Housing_Price_Prediction_EXECUTED.ipynb \
+    reports/Ames_Housing_Analysis_Report.pdf
+```
+
+**Output Example**:
+```
+✅ PDF created successfully: reports/Ames_Housing_Analysis_Report.pdf
+   Size: 1.30 MB
+   Processed: 81 cells (42 code cells)
+   Images: 11 plots/charts
+```
+
+**See**: `automation/pdf_export/README.md` for complete documentation
+
+### 2. Notebook Controller
 
 **Location**: `automation/notebook_controller/notebook_controller.py`
 
@@ -144,7 +186,7 @@ nb.redo()
 nb.save()
 ```
 
-### 2. Notebook Execution
+### 3. Notebook Execution
 
 **Location**: `automation/notebook_execution/execute_notebook.py`
 
@@ -179,7 +221,7 @@ execute_notebook_cells('input.ipynb', 'output.ipynb')
 execute_notebook_cells('input.ipynb', 'output.ipynb', timeout=300)
 ```
 
-### 3. Automation Examples
+### 4. Automation Examples
 
 **Location**: `automation/notebook_controller/examples.py`
 
@@ -209,7 +251,7 @@ python automation/notebook_controller/examples.py all
 python automation/notebook_controller/examples.py
 ```
 
-### 4. Interactive Demo
+### 5. Interactive Demo
 
 **Location**: `automation/notebook_controller/demo.sh`
 
