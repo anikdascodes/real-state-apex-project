@@ -1,0 +1,143 @@
+{
+  "notebook": "notebooks/Ames_Housing_Price_Prediction_VERIFIED.ipynb",
+  "started": "2025-11-15T08:25:52.397057",
+  "last_updated": "2025-11-15T08:25:52.397620",
+  "cells": {
+    "cell_001": {
+      "number": 1,
+      "phase": "Phase 1",
+      "type": "markdown",
+      "description": "Main project title and description",
+      "status": "pending",
+      "executed": false,
+      "verified": false,
+      "output_verified": false,
+      "timestamp": null,
+      "execution_time": null,
+      "notes": []
+    },
+    "cell_002": {
+      "number": 2,
+      "phase": "Phase 1",
+      "type": "markdown",
+      "description": "Team and course details",
+      "status": "pending",
+      "executed": false,
+      "verified": false,
+      "output_verified": false,
+      "timestamp": null,
+      "execution_time": null,
+      "notes": []
+    },
+    "cell_003": {
+      "number": 3,
+      "phase": "Phase 1",
+      "type": "markdown",
+      "description": "Team member table",
+      "status": "pending",
+      "executed": false,
+      "verified": false,
+      "output_verified": false,
+      "timestamp": null,
+      "execution_time": null,
+      "notes": []
+    },
+    "cell_004": {
+      "number": 4,
+      "phase": "Phase 1",
+      "type": "markdown",
+      "description": "Executive summary with problem statement",
+      "status": "pending",
+      "executed": false,
+      "verified": false,
+      "output_verified": false,
+      "timestamp": null,
+      "execution_time": null,
+      "notes": []
+    },
+    "cell_005": {
+      "number": 5,
+      "phase": "Phase 1",
+      "type": "markdown",
+      "description": "Table of contents with hyperlinks",
+      "status": "pending",
+      "executed": false,
+      "verified": false,
+      "output_verified": false,
+      "timestamp": null,
+      "execution_time": null,
+      "notes": []
+    },
+    "cell_006": {
+      "number": 6,
+      "phase": "Phase 1",
+      "type": "markdown",
+      "description": "Phase 1 introduction",
+      "status": "pending",
+      "executed": false,
+      "verified": false,
+      "output_verified": false,
+      "timestamp": null,
+      "execution_time": null,
+      "notes": []
+    },
+    "cell_007": {
+      "number": 7,
+      "phase": "Phase 1",
+      "type": "markdown",
+      "description": "Environment setup description",
+      "status": "pending",
+      "executed": false,
+      "verified": false,
+      "output_verified": false,
+      "timestamp": null,
+      "execution_time": null,
+      "notes": []
+    },
+    "cell_008": {
+      "number": 8,
+      "phase": "Phase 1",
+      "type": "code",
+      "description": "Import all required libraries",
+      "status": "executed",
+      "executed": true,
+      "verified": false,
+      "output_verified": false,
+      "timestamp": "2025-11-15T08:25:52.397200",
+      "execution_time": null,
+      "notes": [],
+      "output_summary": "Libraries imported"
+    }
+  },
+  "phases": {
+    "Phase 1": {
+      "total": 19,
+      "completed": 0,
+      "verified": 0
+    },
+    "Phase 2A": {
+      "total": 40,
+      "completed": 0,
+      "verified": 0
+    },
+    "Phase 2B": {
+      "total": 14,
+      "completed": 0,
+      "verified": 0
+    },
+    "Phase 3": {
+      "total": 20,
+      "completed": 0,
+      "verified": 0
+    }
+  },
+  "issues": [],
+  "statistics": {
+    "total_cells": 93,
+    "completed": 1,
+    "verified": 0,
+    "failed": 0,
+    "percentage_complete": 1.0752688172043012,
+    "percentage_verified": 0.0
+  }
+}
