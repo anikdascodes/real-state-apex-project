@@ -408,32 +408,59 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
 
         .code-block {
-            background: #fafafa;
+            background: #f8f8f8;
             color: #000;
-            padding: 20px;
+            padding: 15px 20px;
             margin: 20px;
-            font-family: 'Courier New', monospace;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 9pt;
-            line-height: 1.5;
-            border: 1px solid #ccc;
+            line-height: 1.6;
+            border: 1px solid #ddd;
+            border-left: 3px solid #000;
         }
 
         .code-block pre {
             margin: 0;
             white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         .code-line {
-            margin: 2px 0;
+            margin: 1px 0;
+            padding: 2px 0;
         }
 
         .line-number {
             display: inline-block;
-            width: 35px;
-            color: #666;
-            margin-right: 20px;
+            width: 30px;
+            color: #999;
+            margin-right: 15px;
             text-align: right;
+            font-weight: normal;
+            user-select: none;
+        }
+
+        .code-content {
+            color: #000;
+        }
+
+        /* Syntax highlighting for Python */
+        .code-comment {
+            color: #6a737d;
+            font-style: italic;
+        }
+
+        .code-string {
+            color: #032f62;
+        }
+
+        .code-keyword {
+            color: #000;
             font-weight: bold;
+        }
+
+        .code-function {
+            color: #000;
         }
 
         .breakdown-table {
@@ -681,8 +708,8 @@ class Phase1PDFGenerator:
         # Table of contents
         content_parts.append(self.generate_toc())
 
-        # How to use guide
-        content_parts.append(self.generate_guide())
+        # About the Dataset section
+        content_parts.append(self.generate_about_dataset())
 
         # Process each cell
         for idx, cell in enumerate(self.phase1_cells):
@@ -723,99 +750,118 @@ class Phase1PDFGenerator:
 """
 
     def generate_toc(self):
-        """Generate table of contents"""
-        toc_items = []
+        """Generate table of contents with topics"""
+        sections = [
+            ("About the Dataset", None),
+            ("", None),  # Separator
+            ("SECTION 1: PROJECT INTRODUCTION", None),
+            ("Project Title & Overview", 1),
+            ("Team Members", 3),
+            ("", None),  # Separator
+            ("SECTION 2: ENVIRONMENT SETUP", None),
+            ("Import Required Libraries", 8),
+            ("", None),  # Separator
+            ("SECTION 3: DATA LOADING", None),
+            ("Load Ames Housing Dataset", 10),
+            ("", None),  # Separator
+            ("SECTION 4: INITIAL DATA EXPLORATION", None),
+            ("Dataset Dimensions & Structure", 12),
+            ("Preview First Rows", 14),
+            ("Column Names & Data Types", 14),
+            ("", None),  # Separator
+            ("SECTION 5: DATA QUALITY ASSESSMENT", None),
+            ("Comprehensive Quality Checks", 16),
+            ("Schema Summary Table", 17),
+            ("", None),  # Separator
+            ("SECTION 6: DATA DICTIONARY", None),
+            ("Data Dictionary Cross-Reference", 18),
+            ("Load Data Dictionary", 19),
+            ("Key Features Overview", 20),
+            ("", None),  # Separator
+            ("SECTION 7: SUMMARY STATISTICS", None),
+            ("Comprehensive Summary Statistics", 24),
+            ("Understanding Summary Statistics (Educational)", 25),
+            ("", None),  # Separator
+            ("SECTION 8: MISSING VALUE ANALYSIS", None),
+            ("Calculate Missing Value Statistics", 28),
+            ("Understanding Missing Values (Educational)", 27),
+        ]
 
-        for idx, cell in enumerate(self.phase1_cells):
-            cell_number = idx + 1
-            cell_type = cell['cell_type']
-            source = ''.join(cell.get('source', []))
-
-            if cell_type == 'markdown':
-                # Extract first header or first line
-                if '🎓 Understanding' in source:
-                    topic = source.split('🎓 Understanding')[1].split('\n')[0].strip()
-                    title = f"🎓 Understanding {topic}"
-                else:
-                    first_line = source.strip().split('\n')[0]
-                    title = first_line.replace('#', '').replace('*', '').strip()[:60]
-            else:  # code
-                # Get explanation title if available
-                if cell_number in CELL_EXPLANATIONS:
-                    title = f"CODE: {CELL_EXPLANATIONS[cell_number]['what'][:50]}..."
-                else:
-                    title = f"Code Cell {cell_number}"
-
-            toc_items.append(f'<li>Cell {cell_number:02d}: {title}</li>')
+        toc_html = '<ul>'
+        for title, cell_num in sections:
+            if title == "":
+                toc_html += '<li style="border:none; height:10px;"></li>'  # Empty separator
+            elif cell_num is None:
+                toc_html += f'<li style="font-weight:bold; background:#f5f5f5; margin-top:10px;">{title}</li>'
+            else:
+                toc_html += f'<li>Cell {cell_num:02d}: {title}</li>'
+        toc_html += '</ul>'
 
         return f"""
 <div class="toc">
     <h2>Table of Contents</h2>
-    <ul>
-        {''.join(toc_items)}
-    </ul>
+    {toc_html}
 </div>
 """
 
-    def generate_guide(self):
-        """Generate how-to-use guide"""
+    def generate_about_dataset(self):
+        """Generate About the Dataset section"""
         return """
 <div class="guide-section">
-    <h2>How to Use This Guide</h2>
+    <h2>About the Dataset</h2>
 
-    <h3>Who Is This For?</h3>
+    <h3>Ames Housing Dataset Overview</h3>
+    <p>The Ames Housing dataset contains comprehensive information about residential properties sold in Ames, Iowa between 2006 and 2010. This dataset is widely used in machine learning and data science education due to its richness and real-world complexity.</p>
+
+    <h3>Dataset Characteristics</h3>
     <ul>
-        <li><strong>Non-Coders:</strong> Every step is explained in plain English with real-world analogies. You don't need programming knowledge to understand the analysis.</li>
-        <li><strong>Coders:</strong> Mathematical formulas, technical details, and implementation specifics are included for deeper understanding.</li>
-        <li><strong>Team Members:</strong> Use this to understand what was done and answer stakeholder questions confidently.</li>
+        <li><strong>Total Records:</strong> 2,930 houses</li>
+        <li><strong>Total Features:</strong> 82 variables (80 predictors + 2 identifiers)</li>
+        <li><strong>Target Variable:</strong> SalePrice (final sale price in dollars)</li>
+        <li><strong>Data Source:</strong> Ames, Iowa Assessor's Office</li>
+        <li><strong>Time Period:</strong> 2006-2010</li>
     </ul>
 
-    <h3>What You'll Find in Each Cell</h3>
+    <h3>Feature Categories</h3>
+    <p>The 82 features describe various aspects of residential homes:</p>
     <ul>
-        <li><strong>WHAT Section:</strong> Plain English explanation of what the code does</li>
-        <li><strong>CODE Section:</strong> Actual Python code with line numbers</li>
-        <li><strong>Line-by-Line Breakdown:</strong> Table explaining what each line of code does</li>
-        <li><strong>WHY Section:</strong> Business justification - why this step matters for the analysis</li>
-        <li><strong>OUTPUT Section:</strong> Actual results from running the code</li>
-        <li><strong>Output Meaning:</strong> Interpretation of what the results tell us</li>
-        <li><strong>COMMON QUESTIONS Section:</strong> Q&A addressing typical questions about this step</li>
+        <li><strong>Physical Characteristics:</strong> Square footage, number of rooms, building type, architectural style</li>
+        <li><strong>Quality & Condition:</strong> Overall quality, material quality, condition ratings</li>
+        <li><strong>Location:</strong> Neighborhood, zoning classification, proximity to features</li>
+        <li><strong>Age:</strong> Year built, year remodeled</li>
+        <li><strong>Lot Information:</strong> Lot size, shape, contour, configuration</li>
+        <li><strong>Basement:</strong> Basement type, finish, quality, square footage</li>
+        <li><strong>Garage:</strong> Type, size, quality, year built</li>
+        <li><strong>Utilities & Systems:</strong> Heating, cooling, electrical, plumbing</li>
+        <li><strong>External Features:</strong> Pool, fence, deck, porch</li>
+        <li><strong>Sale Details:</strong> Sale type, condition, price</li>
     </ul>
 
-    <h3>Cell Types in This Guide</h3>
+    <h3>What We'll Cover in Phase 1</h3>
+    <p>This document focuses on <strong>Phase 1: Data Acquisition & Initial Exploration</strong>, which includes:</p>
     <ul>
-        <li><strong>[CODE] Cells:</strong> Executable Python code that performs data operations</li>
-        <li><strong>[MARKDOWN] Cells:</strong> Documentation, explanations, and context</li>
-        <li><strong>[EDUCATIONAL] Cells:</strong> In-depth concept explanations with formulas (marked with 🎓)</li>
+        <li><strong>Section 1:</strong> Project Introduction & Setup</li>
+        <li><strong>Section 2:</strong> Importing Required Libraries</li>
+        <li><strong>Section 3:</strong> Loading the Dataset</li>
+        <li><strong>Section 4:</strong> Initial Data Exploration (shape, structure, columns)</li>
+        <li><strong>Section 5:</strong> Data Quality Assessment</li>
+        <li><strong>Section 6:</strong> Data Dictionary Reference</li>
+        <li><strong>Section 7:</strong> Summary Statistics</li>
+        <li><strong>Section 8:</strong> Missing Value Analysis</li>
+        <li><strong>Section 9:</strong> Educational Concepts (Statistics, Missing Values)</li>
     </ul>
 
-    <h3>Educational Cells - Understanding Concepts</h3>
-    <p>Educational cells (marked with 🎓) provide deep dives into statistical and machine learning concepts:</p>
+    <h3>Why This Dataset?</h3>
+    <p>The Ames Housing dataset offers several advantages for learning and practicing data science:</p>
     <ul>
-        <li><strong>What Is This?</strong> - Concept definition in plain language</li>
-        <li><strong>Why Do We Need This?</strong> - Practical reasons and business value</li>
-        <li><strong>Mathematical Formulas:</strong> Formulas with symbol definitions and step-by-step examples</li>
-        <li><strong>Real-World Meaning:</strong> How this applies to our Ames Housing data</li>
+        <li><strong>Real-World Complexity:</strong> Contains missing values, outliers, and mixed data types - just like production data</li>
+        <li><strong>Rich Features:</strong> 82 variables provide many opportunities for feature engineering and selection</li>
+        <li><strong>Documented:</strong> Comprehensive data dictionary available with detailed feature descriptions</li>
+        <li><strong>Challenging:</strong> Requires thoughtful handling of categorical variables, missing data, and outliers</li>
+        <li><strong>Practical:</strong> House price prediction is relatable and has clear business value</li>
     </ul>
 
-    <h3>Tips for Reading</h3>
-    <ul>
-        <li><strong>Read sequentially</strong> - Each cell builds on previous ones. Skip cells may cause confusion.</li>
-        <li><strong>Start with WHAT and WHY</strong> - If you're not technical, these sections give you everything you need.</li>
-        <li><strong>Study the breakdowns</strong> - For coders, the line-by-line tables explain implementation details.</li>
-        <li><strong>Don't skip educational cells</strong> - They explain the "why" behind complex techniques.</li>
-        <li><strong>Use Q&A sections</strong> - Prepare for stakeholder meetings by reviewing common questions.</li>
-        <li><strong>Formulas are optional</strong> - Understanding formulas helps, but plain English explanations are complete on their own.</li>
-    </ul>
-
-    <h3>Document Structure</h3>
-    <p>This guide covers <strong>Phase 1: Data Acquisition</strong> (Cells 1-28):</p>
-    <ul>
-        <li>Loading the Ames Housing dataset</li>
-        <li>Initial data exploration (shape, columns, data types)</li>
-        <li>Summary statistics and distributions</li>
-        <li>Missing value identification</li>
-        <li>Understanding key statistical concepts</li>
-    </ul>
+    <p><strong>Document Purpose:</strong> This guide explains every step of Phase 1 with code explanations, outputs, and Q&A to help team members understand the data acquisition and initial exploration process.</p>
 </div>
 """
 
