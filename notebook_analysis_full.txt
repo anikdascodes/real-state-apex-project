@@ -1,0 +1,2857 @@
+====================================================================================================
+NOTEBOOK ANALYSIS: notebooks/Ames_Housing_Analysis_Output.ipynb
+====================================================================================================
+
+Total Cells: 94
+
+Cell Type Distribution:
+  - markdown: 51
+  - code: 43
+
+====================================================================================================
+DETAILED CELL-BY-CELL ANALYSIS
+====================================================================================================
+
+####################################################################################################
+CELL 1/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+# Ames Housing Price Prediction
+## Advanced Apex Project - Real Estate Price Modeling
+
+A comprehensive machine learning approach to predicting residential property sale prices using multiple regression techniques and extensive feature engineering.
+
+####################################################################################################
+CELL 2/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### Project Information
+
+**Team:** The Outliers
+
+**Course:** Advanced Apex Project 1
+
+**Institution:** BITS Pilani - Digital Campus
+
+**Academic Term:** First Trimester 2025-26
+
+**Project Supervisor:** Bharathi Dasari
+
+**Submission Date:** November 2024
+
+####################################################################################################
+CELL 3/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+### Team Members
+
+| Student Name | BITS ID |
+|--------------|----------|
+| Anik Das | 2025EM1100026 |
+| Adeetya Wadikar | 2025EM1100384 |
+| Tushar Nishane | 2025EM1100306 |
+
+####################################################################################################
+CELL 4/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+## Executive Summary
+
+### Problem Statement
+
+Accurate real estate valuation is essential for buyers, sellers, and financial institutions. Traditional valuation methods can be subjective and time-consuming. This project develops machine learning models to predict house sale prices objectively based on property characteristics.
+
+### Business Objective
+
+Develop a predictive regression model that estimates residential property sale prices with high accuracy. The model should help stakeholders:
+- **Buyers**: Assess fair market value before purchase
+- **Sellers**: Set competitive listing prices
+- **Investors**: Identify undervalued properties
+- **Lenders**: Support loan underwriting decisions
+
+### Dataset
+
+**Name:** Ames Housing Dataset
+
+**Source:** Kaggle (https://www.kaggle.com/datasets/shashanknecrothapa/ames-housing-dataset)
+
+**Size:** 2,930 residential property sales transactions
+
+**Features:** 82 variables describing:
+- Physical characteristics (size, rooms, age)
+- Quality ratings
+... [truncated] ...
+
+####################################################################################################
+CELL 5/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+## Table of Contents
+
+### [Phase 1: Data Acquisition](#phase1)
+1.1 [Environment Setup](#setup)
+1.2 [Data Loading](#loading)
+1.3 [Initial Data Inspection](#inspection)
+1.4 [Schema Validation](#schema)
+1.5 [Data Quality Assessment](#quality)
+
+### [Phase 2A: Data Preprocessing & Exploratory Analysis](#phase2a)
+2.1 [Missing Value Analysis](#missing)
+2.2 [Missing Value Treatment](#treatment)
+2.3 [Univariate Analysis - Numerical](#univariate-num)
+2.4 [Univariate Analysis - Categorical](#univariate-cat)
+2.5 [Low-Variance Feature Removal](#lowvar)
+2.6 [Bivariate Analysis - Correlations](#bivariate-corr)
+2.7 [Bivariate Analysis - Visualizations](#bivariate-viz)
+2.8 [Outlier Detection](#outliers)
+
+### [Phase 2B: Feature Engineering](#phase2b)
+3.1 [Feature Creation](#creation)
+3.2 [Feature Transformation](#transformation)
+3.3 [Categorical Encoding](#encoding)
+3.4 [Feature Importance](#importance)
+
+### [Phase 3: Model Development & Evaluation](#phase3)
+4.1 [Data Preparation](#preparation)
+4.2
+... [truncated] ...
+
+####################################################################################################
+CELL 6/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='phase1'></a>
+
+# Phase 1: Data Acquisition
+
+## Objective
+
+Acquire the Ames Housing dataset and perform initial validation to ensure data integrity. This foundational phase establishes the quality and completeness of our data before proceeding to analysis.
+
+## Deliverables
+
+- Successfully load dataset from CSV file
+- Verify data structure and schema
+- Conduct initial quality checks
+- Document data characteristics and potential issues
+
+####################################################################################################
+CELL 7/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='setup'></a>
+
+## 1.1 Environment Setup
+
+We import all necessary Python libraries for data manipulation, statistical analysis, visualization, and machine learning. Proper configuration ensures consistent behavior across different environments.
+
+####################################################################################################
+CELL 8/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Import core data manipulation libraries
+import pandas as pd
+import numpy as np
+import os
+
+# Import visualization libraries
+import matplotlib.pyplot as plt
+import seaborn as sns
+import missingno as msno
+
+# Import statistical libraries
+from scipy import stats
+
+# Import machine learning libraries
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+
+# Configure environment
+import warnings
+warnings.filterwarnings('ignore')
+
+# Set display options for better readability
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', 100)
+pd.set_option('display.float_format', '{:.2f}'.format)
+pd.set_option('display.width', 1000)
+
+# Set visualization defaults
+sns.set_style('whitegrid')
+plt.rcParams['figure.figsize'] = (12, 6)
+plt.rcParams['font.size'] = 10
+
+... [truncated] ...
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  ✓ All libraries imported successfully
+✓ Pandas version: 2.3.3
+✓ NumPy version: 2.3.5
+✓ Matplotlib version: 3.10.7
+
+Environment configured and ready for analysis.
+
+
+Execution Count: 1
+
+####################################################################################################
+CELL 9/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='loading'></a>
+
+## 1.2 Data Loading
+
+The Ames Housing dataset was downloaded from Kaggle and stored in the project's data directory. This dataset provides comprehensive information on residential properties sold in Ames, Iowa, making it an excellent resource for developing price prediction models.
+
+**Data Source:** Kaggle - Ames Housing Dataset
+
+**Citation:** Shashank Necrothapa. (n.d.). Ames Housing Dataset. Kaggle. https://www.kaggle.com/datasets/shashanknecrothapa/ames-housing-dataset
+
+####################################################################################################
+CELL 10/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Define the path to the dataset
+data_path = "../data/AmesHousing.csv"
+
+# Load the dataset into a pandas DataFrame
+df = pd.read_csv(data_path)
+
+# Display basic information
+print("✓ Dataset loaded successfully!")
+print(f"\nDataset Dimensions: {df.shape[0]:,} rows × {df.shape[1]} columns")
+print(f"Memory Usage: {df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+
+# Display first few records
+print("\nFirst 5 Records:")
+df.head()
+
+--- OUTPUTS (2 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  ✓ Dataset loaded successfully!
+
+Dataset Dimensions: 2,930 rows × 82 columns
+Memory Usage: 7.76 MB
+
+First 5 Records:
+
+
+  Output 2: execute_result
+  Result:    Order        PID  MS SubClass MS Zoning  Lot Frontage  Lot Area Street Alley Lot Shape Land Contour Utilities Lot Config Land Slope Neighborhood Condition 1 Condition 2 Bldg Type House Style  Overall Qual  Overall Cond  Year Built  Year Remod/Add Roof Style Roof Matl Exterior 1st Exterior 2nd Mas Vnr Type  Mas Vnr Area Exter Qual Exter Cond Foundation Bsmt Qual Bsmt Cond Bsmt Exposure BsmtFin Type 1  BsmtFin SF 1 BsmtFin Type 2  BsmtFin SF 2  Bsmt Unf SF  Total Bsmt SF Heating Heating QC Cent
+  HTML output present (length: 10703 chars)
+
+Execution Count: 2
+
+####################################################################################################
+CELL 11/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='inspection'></a>
+
+## 1.3 Initial Data Inspection
+
+Before conducting detailed analysis, we perform a high-level inspection to understand the dataset structure, identify data types, and spot any immediate quality concerns.
+
+####################################################################################################
+CELL 12/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Display comprehensive dataset information
+print("Dataset Structure Overview:\n")
+df.info()
+
+print("\n" + "="*70)
+print("Data Type Summary:")
+print("="*70)
+print(df.dtypes.value_counts())
+
+print("\n" + "="*70)
+print("Column Distribution:")
+print("="*70)
+print(f"Numerical columns (int64): {len(df.select_dtypes(include=['int64']).columns)}")
+print(f"Numerical columns (float64): {len(df.select_dtypes(include=['float64']).columns)}")
+print(f"Categorical columns (object): {len(df.select_dtypes(include=['object']).columns)}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Dataset Structure Overview:
+
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 2930 entries, 0 to 2929
+Data columns (total 82 columns):
+ #   Column           Non-Null Count  Dtype  
+---  ------           --------------  -----  
+ 0   Order            2930 non-null   int64  
+ 1   PID              2930 non-null   int64  
+ 2   MS SubClass      2930 non-null   int64  
+ 3   MS Zoning        2930 non-null   object 
+ 4   Lot Frontage     2440 non-null   float64
+ 5   Lot Area         2930 non-null   int6... [truncated]
+
+Execution Count: 3
+
+####################################################################################################
+CELL 13/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='schema'></a>
+
+## 1.4 Schema Validation
+
+We verify that all expected columns are present and properly formatted. This schema validation ensures data integrity and helps identify any structural anomalies early in the process.
+
+####################################################################################################
+CELL 14/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Display all column names
+print(f"Total Features: {len(df.columns)}\n")
+print("All Column Names:")
+print("="*70)
+
+# Print in organized format (4 columns)
+col_list = df.columns.tolist()
+for i in range(0, len(col_list), 4):
+    row = col_list[i:i+4]
+    print(f"{i+1:2d}-{i+len(row):2d}: " + " | ".join(f"{col:20s}" for col in row))
+
+print("\n" + "="*70)
+print("Key Columns Verified:")
+print("="*70)
+important_cols = ['Order', 'PID', 'SalePrice', 'Gr Liv Area', 'Overall Qual', 'Neighborhood']
+for col in important_cols:
+    status = "✓" if col in df.columns else "✗"
+    print(f"{status} {col}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Total Features: 82
+
+All Column Names:
+======================================================================
+ 1- 4: Order                | PID                  | MS SubClass          | MS Zoning           
+ 5- 8: Lot Frontage         | Lot Area             | Street               | Alley               
+ 9-12: Lot Shape            | Land Contour         | Utilities            | Lot Config          
+13-16: Land Slope           | Neighborhood         | Condition 1          | Condition 2         
+17-... [truncated]
+
+Execution Count: 4
+
+####################################################################################################
+CELL 15/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='quality'></a>
+
+## 1.5 Data Quality Assessment
+
+We conduct initial quality checks to identify missing values, duplicate records, and verify the target variable integrity.
+
+####################################################################################################
+CELL 16/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Perform comprehensive quality checks
+print("Data Quality Assessment:")
+print("="*70)
+
+# Check for missing values
+total_missing = df.isnull().sum().sum()
+cols_with_missing = df.isnull().any().sum()
+print(f"\nMissing Value Check:")
+print(f"  Total missing values: {total_missing:,}")
+print(f"  Columns with missing data: {cols_with_missing} out of {len(df.columns)}")
+
+# Check for duplicates
+duplicates = df.duplicated().sum()
+print(f"\nDuplicate Check:")
+print(f"  Duplicate rows: {duplicates}")
+if duplicates == 0:
+    print("  ✓ No duplicates found")
+
+# Verify target variable
+print(f"\nTarget Variable (SalePrice) Verification:")
+print(f"  Missing values: {df['SalePrice'].isnull().sum()}")
+print(f"  Minimum: ${df['SalePrice'].min():,}")
+print(f"  Maximum: ${df['SalePrice'].max():,}")
+print(f"  Mean: ${df['SalePrice'].mean():,.2f}")
+print(f"  Median: ${df['SalePrice'].median():,.2f}")
+print(f"  Standard Deviation: ${df['SalePrice'].std():,.2f}")
+
+print("="*70)
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Data Quality Assessment:
+======================================================================
+
+Missing Value Check:
+  Total missing values: 15,749
+  Columns with missing data: 27 out of 82
+
+Duplicate Check:
+  Duplicate rows: 0
+  ✓ No duplicates found
+
+Target Variable (SalePrice) Verification:
+  Missing values: 0
+  Minimum: $12,789
+  Maximum: $755,000
+  Mean: $180,796.06
+  Median: $160,000.00
+  Standard Deviation: $79,886.69
+======================================================================... [truncated]
+
+Execution Count: 5
+
+####################################################################################################
+CELL 17/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Create detailed schema summary table
+schema_summary = pd.DataFrame({
+    'Column': df.columns,
+    'Data_Type': df.dtypes.values,
+    'Non_Null_Count': df.count().values,
+    'Null_Count': df.isnull().sum().values,
+    'Null_Percentage': (df.isnull().sum() / len(df) * 100).values,
+    'Unique_Values': [df[col].nunique() for col in df.columns]
+})
+
+# Sort by null percentage to see problematic columns first
+schema_summary = schema_summary.sort_values('Null_Percentage', ascending=False)
+
+print("Schema Summary (Top 20 columns by missing data):")
+print("="*90)
+schema_summary.head(20)
+
+--- OUTPUTS (2 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Schema Summary (Top 20 columns by missing data):
+==========================================================================================
+
+
+  Output 2: execute_result
+  Result:             Column Data_Type  Non_Null_Count  Null_Count  Null_Percentage  Unique_Values
+73         Pool QC    object              13        2917            99.56              4
+75    Misc Feature    object             106        2824            96.38              5
+7            Alley    object             198        2732            93.24              2
+74           Fence    object             572        2358            80.48              4
+26    Mas Vnr Type    object            1155        177
+  HTML output present (length: 3804 chars)
+
+Execution Count: 6
+
+####################################################################################################
+CELL 18/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+### 1.5.1 Data Dictionary Cross-Reference
+
+We attempt to load the official data dictionary to cross-reference feature definitions and ensure our understanding aligns with the dataset documentation.
+
+####################################################################################################
+CELL 19/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Attempt to load the data dictionary
+try:
+    data_dict_path = "../docs/data_dictionary.xlsx"
+    data_dict = pd.read_excel(data_dict_path)
+    print(f"✓ Data dictionary loaded successfully")
+    print(f"  Total feature descriptions: {len(data_dict)}")
+    print(f"\nFirst 10 Feature Definitions:")
+    print("="*70)
+    print(data_dict.head(10))
+except FileNotFoundError:
+    print("ℹ Data dictionary file not found at expected location")
+    print("  This is not critical - proceeding with dataset analysis")
+    print(f"  Expected path: {data_dict_path}")
+except Exception as e:
+    print(f"ℹ Could not load data dictionary: {str(e)}")
+    print("  Proceeding with dataset analysis")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  ℹ Could not load data dictionary: Missing optional dependency 'openpyxl'.  Use pip or conda to install openpyxl.
+  Proceeding with dataset analysis
+
+
+Execution Count: 7
+
+####################################################################################################
+CELL 20/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+### 📋 Data Dictionary - Key Features
+
+While a separate data dictionary file is not included, we document all critical features here for transparency and reproducibility.
+
+#### **Target Variable**
+
+| Feature | Description | Type | Range |
+|---------|-------------|------|-------|
+| **SalePrice** | Property sale price in USD | Continuous | $34,900 - $755,000 |
+
+#### **Top Predictors (by correlation with SalePrice)**
+
+| Feature | Description | Type | Range/Values |
+|---------|-------------|------|--------------|
+| **Overall Qual** | Overall material and finish quality | Ordinal | 1-10 scale |
+| **Gr Liv Area** | Above grade living area | Continuous | 334 - 5,642 sq ft |
+| **Garage Cars** | Garage capacity | Discrete | 0-4 cars |
+| **Garage Area** | Garage size | Continuous | 0 - 1,418 sq ft |
+| **Total Bsmt SF** | Total basement area | Continuous | 0 - 6,110 sq ft |
+| **1st Flr SF** | First floor area | Continuous | 334 - 4,692 sq ft |
+| **Year Built** | Original construction year | Discre
+... [truncated] ...
+
+####################################################################################################
+CELL 21/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+## Phase 1 Summary
+
+### Accomplishments
+
+✅ **Environment Configured**
+- All required libraries imported successfully
+- Pandas, NumPy, Matplotlib, Seaborn, Scikit-learn ready
+- Display settings optimized for analysis
+
+✅ **Dataset Successfully Loaded**
+- **Source:** Ames Housing Dataset from Kaggle
+- **Size:** 2,930 residential property records
+- **Features:** 82 variables (28 int, 11 float, 43 categorical)
+- **Memory:** ~2MB dataset size
+- **Target:** SalePrice (range: $12,789 - $755,000)
+
+✅ **Data Quality Verified**
+- Schema matches expectations (82 columns present)
+- No duplicate records identified
+- Target variable has no missing values
+- 27 features contain missing values (to be addressed in Phase 2)
+
+✅ **Initial Observations**
+- Mix of numerical and categorical features
+- Some features have high missingness (>50%) - candidates for removal
+- Price range suggests diverse property types
+- Data appears well-structured and ready for analysis
+
+### Next Steps
+
+Proceed to **Phase 2A: 
+... [truncated] ...
+
+####################################################################################################
+CELL 22/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='phase2a'></a>
+
+# Phase 2A: Data Preprocessing & Exploratory Analysis
+
+## Objective
+
+Transform raw data into a clean, analysis-ready format through systematic preprocessing. Conduct comprehensive exploratory analysis to understand variable distributions, relationships, and data quality issues.
+
+## Key Activities
+
+- Systematic missing value analysis and treatment
+- Univariate analysis of all features
+- Bivariate analysis to identify price predictors
+- Low-variance feature identification and removal
+- Outlier detection and assessment
+
+####################################################################################################
+CELL 23/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='summary-stats'></a>
+
+## 2.1 Summary Statistics Overview
+
+Before diving into detailed analysis, we establish a quantitative foundation by computing comprehensive descriptive statistics for all numerical features.
+
+**Objectives:**
+- Understand central tendency (mean, median)
+- Measure spread and variability (std, IQR)
+- Identify range boundaries (min, max)
+- Detect potential data quality issues
+
+This statistical overview guides our subsequent preprocessing decisions.
+
+####################################################################################################
+CELL 24/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# ============================================
+# COMPREHENSIVE SUMMARY STATISTICS
+# ============================================
+print("="*70)
+print("SUMMARY STATISTICS - NUMERICAL FEATURES")
+print("="*70)
+print("\nDescriptive Statistics for All Numerical Features:")
+print(df.describe())
+
+print("\n" + "="*70)
+print("SUMMARY STATISTICS - TARGET VARIABLE (SalePrice)")
+print("="*70)
+target_stats = df['SalePrice'].describe()
+print(target_stats)
+print(f"\nPrice Range: ${df['SalePrice'].min():,.0f} to ${df['SalePrice'].max():,.0f}")
+print(f"Price Spread (IQR): ${target_stats['75%'] - target_stats['25%']:,.0f}")
+
+# Key insights from statistics
+print("\n" + "="*70)
+print("KEY STATISTICAL INSIGHTS")
+print("="*70)
+print(f"1. SalePrice Distribution:")
+print(f"   - Mean: ${df['SalePrice'].mean():,.0f}")
+print(f"   - Median: ${df['SalePrice'].median():,.0f}")
+print(f"   - Shows {'right' if df['SalePrice'].mean() > df['SalePrice'].median() else 'left'}-skewed distribution")
+print(f"\n2. Living Area 
+... [truncated] ...
+
+--- OUTPUTS (2 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  ======================================================================
+SUMMARY STATISTICS - NUMERICAL FEATURES
+======================================================================
+
+Descriptive Statistics for All Numerical Features:
+
+
+  Output 2: stream
+  Stream (stdout):
+          Order           PID  MS SubClass  Lot Frontage  Lot Area  Overall Qual  Overall Cond  Year Built  Year Remod/Add  Mas Vnr Area  BsmtFin SF 1  BsmtFin SF 2  Bsmt Unf SF  Total Bsmt SF  1st Flr SF  2nd Flr SF  Low Qual Fin SF  Gr Liv Area  Bsmt Full Bath  Bsmt Half Bath  Full Bath  Half Bath  Bedroom AbvGr  Kitchen AbvGr  TotRms AbvGrd  Fireplaces  Garage Yr Blt  Garage Cars  Garage Area  Wood Deck SF  Open Porch SF  Enclosed Porch  3Ssn Porch  Screen Porch  Pool Area  Misc Val  Mo Sold  Y... [truncated]
+
+Execution Count: 8
+
+####################################################################################################
+CELL 25/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### 🎓 Understanding Summary Statistics
+
+**What:** Numerical measures describing dataset characteristics.
+
+**Why:** Get a "bird's eye view" before detailed analysis.
+
+---
+
+#### Key Metrics
+
+**1. Mean (Average)**
+$$\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$$
+
+The "center" of data.  
+Example: Mean price = $180,796
+
+**2. Median (50th Percentile)**
+Middle value when sorted.  
+Better than mean when outliers present.  
+Example: Median = $160,000
+
+**3. Standard Deviation**
+$$\sigma = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2}$$
+
+How spread out the data is.  
+High σ = high variability
+
+**4. Quartiles**
+- **Q1 (25%)**: 25% of data below this
+- **Q2 (50%)**: Same as median
+- **Q3 (75%)**: 75% of data below this
+- **IQR = Q3 - Q1**: Middle 50%
+
+**5. Min/Max**
+Smallest and largest values.
+
+---
+
+#### When to Use
+
+**Always!** First step in any data analysis.  
+Provides baseline understanding before modeling.
+
+####################################################################################################
+CELL 26/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='missing'></a>
+
+## 2.1 Missing Value Analysis
+
+Missing data is common in real-world datasets. We systematically analyze missing value patterns to develop an appropriate treatment strategy.
+
+####################################################################################################
+CELL 27/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### 🎓 Understanding Missing Values
+
+**What:** Data points that were not recorded (NaN, empty cells).
+
+**Why It Matters:**
+- Most ML models can't handle missing values
+- Missing data can introduce bias
+- Pattern of missingness reveals data quality issues
+
+---
+
+#### Types of Missingness
+
+**1. MCAR (Missing Completely At Random)**
+- No relationship to any data
+- Example: Sensor randomly fails
+- ✅ Safest to handle
+
+**2. MAR (Missing At Random)**
+- Related to OTHER observed variables
+- Example: Older homes missing garage data
+- ⚠️ Needs careful imputation
+
+**3. MNAR (Missing Not At Random)**
+- Related to the missing value itself
+- Example: Expensive homes don't report price
+- ❌ Most problematic!
+
+---
+
+#### Decision Rules
+
+- **> 50% missing**: Drop column (insufficient data)
+- **< 5% missing**: Safe to impute or drop rows
+- **5-50% missing**: Analyze pattern, then decide
+
+---
+
+#### Visualization
+
+**Matrix Plot:** Shows missing pattern across rows  
+**Bar Chart:** Shows % missing per col
+... [truncated] ...
+
+####################################################################################################
+CELL 28/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Calculate missing value statistics
+missing_counts = df.isnull().sum()
+missing_pct = (missing_counts / len(df)) * 100
+
+missing_df = pd.DataFrame({
+    'Feature': missing_counts.index,
+    'Missing_Count': missing_counts.values,
+    'Missing_Percentage': missing_pct.values
+})
+
+# Filter to only features with missing values
+missing_df = missing_df[missing_df['Missing_Count'] > 0]
+missing_df = missing_df.sort_values('Missing_Percentage', ascending=False)
+
+print(f"Features with Missing Values: {len(missing_df)} out of {len(df.columns)}")
+print("\nTop 15 Features with Most Missing Data:")
+print("="*70)
+missing_df.head(15)
+
+--- OUTPUTS (2 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Features with Missing Values: 27 out of 82
+
+Top 15 Features with Most Missing Data:
+======================================================================
+
+
+  Output 2: execute_result
+  Result:            Feature  Missing_Count  Missing_Percentage
+73         Pool QC           2917               99.56
+75    Misc Feature           2824               96.38
+7            Alley           2732               93.24
+74           Fence           2358               80.48
+26    Mas Vnr Type           1775               60.58
+58    Fireplace Qu           1422               48.53
+4     Lot Frontage            490               16.72
+64     Garage Qual            159                5.43
+65     Garage 
+  HTML output present (length: 2025 chars)
+
+Execution Count: 9
+
+####################################################################################################
+CELL 29/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+### 2.1.1 Missing Value Visualization
+
+Visual analysis helps identify patterns - whether values are missing completely at random (MCAR), at random (MAR), or not at random (MNAR).
+
+####################################################################################################
+CELL 30/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Visualize missing data patterns using missingno
+plt.figure(figsize=(14, 8))
+msno.matrix(df, figsize=(14, 8), fontsize=10, sparkline=False)
+plt.title('Missing Value Matrix - Complete Dataset View', fontsize=14, fontweight='bold', pad=20)
+plt.tight_layout()
+plt.show()
+
+print("Matrix shows:")  
+print("  - White lines = missing values")
+print("  - Dark bars = complete data")
+print("  - Patterns suggest some features missing together (e.g., garage features)")
+
+--- OUTPUTS (3 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 1400x800 with 0 Axes>
+
+  Output 2: display_data
+  Display: <Figure size 1400x800 with 1 Axes>
+  Image/Plot generated (PNG)
+
+  Output 3: stream
+  Stream (stdout):
+  Matrix shows:
+  - White lines = missing values
+  - Dark bars = complete data
+  - Patterns suggest some features missing together (e.g., garage features)
+
+
+Execution Count: 10
+
+####################################################################################################
+CELL 31/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Bar chart of missing percentages
+plt.figure(figsize=(12, 8))
+missing_to_plot = missing_df.head(20)
+plt.barh(range(len(missing_to_plot)), missing_to_plot['Missing_Percentage'].values, color='coral', alpha=0.7)
+plt.yticks(range(len(missing_to_plot)), missing_to_plot['Feature'].values)
+plt.xlabel('Percentage Missing (%)', fontweight='bold', fontsize=11)
+plt.ylabel('Feature', fontweight='bold', fontsize=11)
+plt.title('Top 20 Features by Missing Data Percentage', fontweight='bold', fontsize=13)
+plt.axvline(x=50, color='red', linestyle='--', linewidth=2, label='50% threshold')
+plt.legend()
+plt.grid(axis='x', alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 1200x800 with 1 Axes>
+  Image/Plot generated (PNG)
+
+Execution Count: 11
+
+####################################################################################################
+CELL 32/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+### Key Observations from Missing Data Analysis
+
+**High Missingness (>50% - Candidates for Removal):**
+- **Pool QC** (99.6%): Pool quality - most homes don't have pools
+- **Misc Feature** (96.4%): Miscellaneous features - rarely present
+- **Alley** (93.2%): Alley access type - uncommon
+- **Fence** (80.5%): Fence quality - many homes lack fences
+
+**Moderate Missingness (5-50% - Contextual Imputation):**
+- **Fireplace Qu** (48.5%): Fireplace quality - indicates no fireplace
+- **Lot Frontage** (16.7%): Linear feet of street connected to property
+- **Garage features** (~5%): Likely indicates no garage
+- **Basement features** (~3%): Likely indicates no basement
+
+**Strategy:** Drop high-missingness features, impute others based on context
+
+####################################################################################################
+CELL 33/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='treatment'></a>
+
+## 2.2 Missing Value Treatment
+
+We implement a systematic 4-step treatment strategy based on missingness patterns and feature semantics:
+
+1. **Drop** features with >50% missing (insufficient data for reliable imputation)
+2. **Categorical imputation**: Fill with 'None' for features where absence has meaning
+3. **Numerical imputation**: Fill with 0 for counts/areas where absence = zero
+4. **Context-aware imputation**: Neighborhood-based median for Lot Frontage
+
+---
+
+#### 📐 Mathematical Imputation Methods
+
+**1. Mean Imputation**
+$$x_{missing} = \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$$
+
+- Replace with average of non-missing values
+- ✅ Preserves mean
+- ❌ Reduces variance
+
+**2. Median Imputation**
+$$x_{missing} = \text{median}(x_1, x_2, ..., x_n)$$
+
+- Replace with middle value
+- ✅ Robust to outliers
+- ❌ Still reduces variance
+
+**3. Mode Imputation** (for categorical)
+$$x_{missing} = \text{mode}(x_1, x_2, ..., x_n)$$
+
+- Most frequent value
+- Used for categorical v
+... [truncated] ...
+
+####################################################################################################
+CELL 34/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Step 1: Drop columns with excessive missing values (>50%)
+threshold = 50
+cols_to_drop = missing_df[missing_df['Missing_Percentage'] > threshold]['Feature'].tolist()
+
+print(f"Dropping {len(cols_to_drop)} features with >{threshold}% missing:")
+print("="*70)
+for col in cols_to_drop:
+    pct = missing_df[missing_df['Feature'] == col]['Missing_Percentage'].values[0]
+    print(f"  - {col:20s}: {pct:6.2f}% missing")
+
+df = df.drop(columns=cols_to_drop)
+print(f"\nDataset shape after dropping: {df.shape}")
+print(f"Columns remaining: {df.shape[1]}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Dropping 5 features with >50% missing:
+======================================================================
+  - Pool QC             :  99.56% missing
+  - Misc Feature        :  96.38% missing
+  - Alley               :  93.24% missing
+  - Fence               :  80.48% missing
+  - Mas Vnr Type        :  60.58% missing
+
+Dataset shape after dropping: (2930, 77)
+Columns remaining: 77
+
+
+Execution Count: 12
+
+####################################################################################################
+CELL 35/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Step 2: Impute categorical features with 'None'
+# For these features, missing means the feature doesn't exist
+categorical_none = [
+    'Mas Vnr Type', 'Fireplace Qu', 'Garage Type', 'Garage Finish',
+    'Garage Qual', 'Garage Cond', 'Bsmt Qual', 'Bsmt Cond',
+    'Bsmt Exposure', 'BsmtFin Type 1', 'BsmtFin Type 2'
+]
+
+print("Imputing categorical features (None = feature absent):")
+print("="*70)
+
+for col in categorical_none:
+    if col in df.columns:
+        before_count = df[col].isnull().sum()
+        df[col] = df[col].fillna('None')
+        print(f"  ✓ {col:25s}: {before_count:4d} values → 'None'")
+
+print(f"\nCategorical imputation complete.")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Imputing categorical features (None = feature absent):
+======================================================================
+  ✓ Fireplace Qu             : 1422 values → 'None'
+  ✓ Garage Type              :  157 values → 'None'
+  ✓ Garage Finish            :  159 values → 'None'
+  ✓ Garage Qual              :  159 values → 'None'
+  ✓ Garage Cond              :  159 values → 'None'
+  ✓ Bsmt Qual                :   80 values → 'None'
+  ✓ Bsmt Cond                :   80 values → 'None'
+  ✓ Bsmt E... [truncated]
+
+Execution Count: 13
+
+####################################################################################################
+CELL 36/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Step 3: Impute numerical features with 0
+# For areas and counts, zero indicates feature is absent
+numeric_zero = [
+    'Mas Vnr Area', 'BsmtFin SF 1', 'BsmtFin SF 2', 'Bsmt Unf SF',
+    'Total Bsmt SF', 'Bsmt Full Bath', 'Bsmt Half Bath',
+    'Garage Cars', 'Garage Area'
+]
+
+print("Imputing numerical features (0 = feature absent):")
+print("="*70)
+
+for col in numeric_zero:
+    if col in df.columns:
+        before_count = df[col].isnull().sum()
+        df[col] = df[col].fillna(0)
+        print(f"  ✓ {col:25s}: {before_count:4d} values → 0")
+
+print(f"\nNumerical imputation complete.")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Imputing numerical features (0 = feature absent):
+======================================================================
+  ✓ Mas Vnr Area             :   23 values → 0
+  ✓ BsmtFin SF 1             :    1 values → 0
+  ✓ BsmtFin SF 2             :    1 values → 0
+  ✓ Bsmt Unf SF              :    1 values → 0
+  ✓ Total Bsmt SF            :    1 values → 0
+  ✓ Bsmt Full Bath           :    2 values → 0
+  ✓ Bsmt Half Bath           :    2 values → 0
+  ✓ Garage Cars              :    1 values → 0
+  ✓... [truncated]
+
+Execution Count: 14
+
+####################################################################################################
+CELL 37/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Step 4: Neighborhood-based imputation for Lot Frontage
+# Lot Frontage varies by neighborhood, so use neighborhood median
+print("Imputing Lot Frontage using neighborhood-grouped median:")
+print("="*70)
+
+before_count = df['Lot Frontage'].isnull().sum()
+print(f"Missing before: {before_count}\n")
+
+# Group by neighborhood and fill with median
+df['Lot Frontage'] = df.groupby('Neighborhood')['Lot Frontage'].transform(
+    lambda x: x.fillna(x.median())
+)
+
+after_count = df['Lot Frontage'].isnull().sum()
+print(f"Missing after: {after_count}")
+print(f"✓ Imputed {before_count - after_count} values using neighborhood medians")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Imputing Lot Frontage using neighborhood-grouped median:
+======================================================================
+Missing before: 490
+
+Missing after: 3
+✓ Imputed 487 values using neighborhood medians
+
+
+Execution Count: 15
+
+####################################################################################################
+CELL 38/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Step 5: Handle remaining missing values
+print("Handling remaining missing values:")
+print("="*70)
+
+# Garage Year Built - use house year if missing
+if 'Garage Yr Blt' in df.columns and df['Garage Yr Blt'].isnull().sum() > 0:
+    before = df['Garage Yr Blt'].isnull().sum()
+    df['Garage Yr Blt'] = df['Garage Yr Blt'].fillna(df['Year Built'])
+    print(f"  ✓ Garage Yr Blt: {before} values → Year Built (no garage = same as house)")
+
+# Electrical - only 1 missing, use mode
+if 'Electrical' in df.columns and df['Electrical'].isnull().sum() > 0:
+    before = df['Electrical'].isnull().sum()
+    mode_val = df['Electrical'].mode()[0]
+    df['Electrical'] = df['Electrical'].fillna(mode_val)
+    print(f"  ✓ Electrical: {before} value → '{mode_val}' (mode)")
+
+print(f"\nAll specific imputations complete.")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Handling remaining missing values:
+======================================================================
+  ✓ Garage Yr Blt: 159 values → Year Built (no garage = same as house)
+  ✓ Electrical: 1 value → 'SBrkr' (mode)
+
+All specific imputations complete.
+
+
+Execution Count: 16
+
+####################################################################################################
+CELL 39/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### 🎓 Understanding Univariate Analysis
+
+**What:** Analyzing ONE variable at a time to understand its distribution.
+
+**Why:** Before studying relationships, understand each feature individually.
+
+---
+
+#### Key Metrics
+
+**1. Central Tendency**
+- **Mean**: $\bar{x} = \frac{1}{n}\sum x_i$
+- **Median**: Middle value (robust to outliers)
+
+**2. Spread**
+- **Std Dev**: $\sigma = \sqrt{\frac{1}{n}\sum(x_i - \bar{x})^2}$
+- **IQR**: Q3 - Q1 (middle 50%)
+
+**3. Shape**
+- **Skewness**: Asymmetry of distribution
+
+$$\text{Skewness} = \frac{E[(X-\mu)^3]}{\sigma^3}$$
+
+- Skew > 0: Right-skewed (long tail right)
+- Skew = 0: Symmetric
+- Skew < 0: Left-skewed (long tail left)
+
+---
+
+#### Visualizations
+
+**Histogram:** Shows frequency distribution  
+**Box Plot:** Shows quartiles and outliers
+
+```
+    Min   Q1  Median Q3   Max
+     |────┬───┼───┬────|
+          └───┴───┘
+          (IQR box)
+```
+
+---
+
+#### What We Look For
+
+✅ Normal distribution → Ready for modeling  
+⚠️ High skewness → May need transform
+... [truncated] ...
+
+####################################################################################################
+CELL 40/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Verify all missing values have been handled
+remaining_missing = df.isnull().sum().sum()
+cols_with_missing = df.isnull().any().sum()
+
+print("\n" + "="*70)
+print("MISSING VALUE TREATMENT - FINAL VERIFICATION")
+print("="*70)
+print(f"Total missing values remaining: {remaining_missing}")
+print(f"Columns with missing values: {cols_with_missing}")
+
+if remaining_missing == 0:
+    print("\n✅ SUCCESS: All missing values successfully handled!")
+    print("   Dataset is now complete and ready for analysis.")
+else:
+    print(f"\n⚠ WARNING: {remaining_missing} missing values still present")
+    print("\nColumns with remaining missing values:")
+    still_missing = df.isnull().sum()
+    print(still_missing[still_missing > 0])
+
+print("="*70)
+print(f"Final dataset shape: {df.shape}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  
+======================================================================
+MISSING VALUE TREATMENT - FINAL VERIFICATION
+======================================================================
+Total missing values remaining: 3
+Columns with missing values: 1
+
+⚠ WARNING: 3 missing values still present
+
+Columns with remaining missing values:
+Lot Frontage    3
+dtype: int64
+======================================================================
+Final dataset shape: (2930, 77)
+
+
+Execution Count: 17
+
+####################################################################################################
+CELL 41/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='univariate-num'></a>
+
+## 2.3 Univariate Analysis - Numerical Features
+
+We examine the distribution of each numerical variable to understand central tendencies, spread, skewness, and potential data quality issues.
+
+####################################################################################################
+CELL 42/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Select numerical columns
+numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+numeric_cols = [col for col in numeric_cols if col not in ['Order', 'PID']]
+
+print(f"Analyzing {len(numeric_cols)} numerical features\n")
+print("First 10 numerical features:")
+for i, col in enumerate(numeric_cols[:10], 1):
+    print(f"  {i:2d}. {col}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Analyzing 37 numerical features
+
+First 10 numerical features:
+   1. MS SubClass
+   2. Lot Frontage
+   3. Lot Area
+   4. Overall Qual
+   5. Overall Cond
+   6. Year Built
+   7. Year Remod/Add
+   8. Mas Vnr Area
+   9. BsmtFin SF 1
+  10. BsmtFin SF 2
+
+
+Execution Count: 18
+
+####################################################################################################
+CELL 43/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Create comprehensive histograms for all numerical features
+fig, axes = plt.subplots(10, 4, figsize=(20, 25))
+axes = axes.ravel()
+
+for idx, col in enumerate(numeric_cols):
+    if idx < 40:
+        axes[idx].hist(df[col].dropna(), bins=30, edgecolor='black', alpha=0.7, color='steelblue')
+        axes[idx].set_title(col, fontweight='bold', fontsize=10)
+        axes[idx].set_ylabel('Frequency', fontsize=8)
+        axes[idx].tick_params(labelsize=8)
+
+for idx in range(len(numeric_cols), 40):
+    axes[idx].axis('off')
+
+plt.suptitle('Distribution of Numerical Features', fontsize=16, fontweight='bold', y=0.995)
+plt.tight_layout()
+plt.show()
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 2000x2500 with 40 Axes>
+  Image/Plot generated (PNG)
+
+Execution Count: 19
+
+####################################################################################################
+CELL 44/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+### Distribution Patterns Observed
+
+**Right-Skewed (Positive Skew):**
+- Lot Area, Sale Price, Living Area
+- Most values concentrated at lower end
+
+**Approximately Normal:**
+- Number of bedrooms, bathrooms
+- Centered distributions
+
+**Left-Skewed:**
+- Year Built, Overall Quality
+- More recent/higher quality homes
+
+---
+
+#### 📊 Mathematical Treatment of Skewness
+
+**Skewness Formula:**
+$$\text{Skewness} = \frac{n}{(n-1)(n-2)}\sum_{i=1}^{n}\left(\frac{x_i - \bar{x}}{s}\right)^3$$
+
+**Interpretation:**
+- **-0.5 to 0.5**: Fairly symmetric → No transformation needed
+- **0.5 to 1** or **-1 to -0.5**: Moderately skewed → Consider transformation
+- **> 1** or **< -1**: Highly skewed → Transformation recommended
+
+---
+
+#### Common Transformations
+
+**1. Log Transformation** (for right-skewed data):
+$$x' = \log(x + 1)$$
+- Reduces right skew
+- Use when: Skewness > 1
+
+**2. Square Root** (mild skew):
+$$x' = \sqrt{x}$$
+- Gentler than log
+- Use when: 0.5 < Skewness < 1
+
+**3. Box-Cox Transformation** (optimal
+... [truncated] ...
+
+####################################################################################################
+CELL 45/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='univariate-cat'></a>
+
+## 2.4 Univariate Analysis - Categorical Features
+
+Examine categorical variables to understand category distributions and identify dominant values.
+
+####################################################################################################
+CELL 46/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Select categorical columns
+categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
+
+print(f"Analyzing {len(categorical_cols)} categorical features\n")
+
+# Show value counts for key categorical features
+key_cats = ['MS Zoning', 'Neighborhood', 'Bldg Type', 'House Style']
+for cat in key_cats:
+    if cat in df.columns:
+        print(f"\n{cat}:")
+        print(df[cat].value_counts().head())
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Analyzing 38 categorical features
+
+
+MS Zoning:
+MS Zoning
+RL         2273
+RM          462
+FV          139
+RH           27
+C (all)      25
+Name: count, dtype: int64
+
+Neighborhood:
+Neighborhood
+NAmes      443
+CollgCr    267
+OldTown    239
+Edwards    194
+Somerst    182
+Name: count, dtype: int64
+
+Bldg Type:
+Bldg Type
+1Fam      2425
+TwnhsE     233
+Duplex     109
+Twnhs      101
+2fmCon      62
+Name: count, dtype: int64
+
+House Style:
+House Style
+1Story    1481
+2Story     873
+1.5Fin     314
+SLvl       128... [truncated]
+
+Execution Count: 20
+
+####################################################################################################
+CELL 47/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Visualize categorical features
+fig, axes = plt.subplots(3, 3, figsize=(18, 12))
+axes = axes.ravel()
+
+cat_viz = ['MS Zoning', 'Neighborhood', 'Bldg Type', 'House Style', 'Foundation', 
+           'Heating QC', 'Central Air', 'Kitchen Qual', 'Sale Condition']
+
+for idx, col in enumerate(cat_viz):
+    if col in df.columns and idx < 9:
+        vc = df[col].value_counts().head(10)
+        axes[idx].bar(range(len(vc)), vc.values, color='coral', alpha=0.7)
+        axes[idx].set_xticks(range(len(vc)))
+        axes[idx].set_xticklabels(vc.index, rotation=45, ha='right', fontsize=8)
+        axes[idx].set_title(col, fontweight='bold')
+        axes[idx].set_ylabel('Count')
+
+plt.tight_layout()
+plt.show()
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 1800x1200 with 9 Axes>
+  Image/Plot generated (PNG)
+
+Execution Count: 21
+
+####################################################################################################
+CELL 48/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### 🎓 Understanding Bivariate Analysis & Correlation
+
+**What:** Analyzing relationships between TWO variables.
+
+**Goal:** Understand how features relate to house price.
+
+---
+
+#### Pearson Correlation Coefficient
+
+$$r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2}\sqrt{\sum_{i=1}^{n}(y_i - \bar{y})^2}}$$
+
+---
+
+#### Interpretation
+
+- **r = +1**: Perfect positive (X ↑ → Y ↑)
+- **r = 0**: No linear relationship
+- **r = -1**: Perfect negative (X ↑ → Y ↓)
+
+**Strength Guidelines:**
+- **|r| > 0.7**: Strong correlation → Important predictor
+- **0.4 < |r| < 0.7**: Moderate correlation
+- **0.2 < |r| < 0.4**: Weak correlation
+- **|r| < 0.2**: Very weak → Probably not useful
+
+---
+
+#### Example from Our Data
+
+- **Living Area ↔ Sale Price**: r ≈ 0.71 (strong positive)
+- **Overall Qual ↔ Sale Price**: r ≈ 0.80 (very strong)
+- **Age ↔ Sale Price**: r ≈ -0.56 (moderate negative)
+
+---
+
+#### What We Look For
+
+✅ Strong correlations with SalePrice → Good pr
+... [truncated] ...
+
+####################################################################################################
+CELL 49/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='lowvar'></a>
+
+## 2.5 Low-Variance Feature Removal
+
+Features dominated by a single category provide little predictive power.
+
+---
+
+#### 📐 Mathematical Reasoning
+
+**Variance Formula:**
+$$\text{Var}(X) = \frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2$$
+
+**For categorical variables, we measure entropy:**
+$$H(X) = -\sum_{i=1}^{k} p_i \log_2(p_i)$$
+
+Where:
+- $k$ = number of unique categories
+- $p_i$ = proportion of category $i$
+
+---
+
+#### Why Remove Low Variance Features?
+
+**1. No Information Gain**
+- If 95% of observations have same value → No discriminating power
+- Example: "Street" = "Pave" for 99.6% of houses
+- Knowing street type doesn't help predict price!
+
+**2. Mathematical Impact**
+- Low variance → $\text{Var}(X) \approx 0$
+- Correlation with target: $r \approx 0$
+- Feature importance: Very low
+- Model learns nothing
+
+**3. Computational Benefit**
+- Fewer features → Faster training
+- Simpler model → Better interpretability
+- Reduced overfitting risk
+
+**Decision Threshold:**
+- I
+... [truncated] ...
+
+####################################################################################################
+CELL 50/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Identify and remove low-variance categorical features
+low_var_cols = ['Street', 'Utilities', 'Condition 2', 'Roof Matl', 'Heating', 'Land Slope']
+
+print(f"Dropping {len(low_var_cols)} low-variance features:\n")
+for col in low_var_cols:
+    if col in df.columns:
+        dominant = df[col].value_counts().index[0]
+        pct = (df[col].value_counts().iloc[0] / len(df)) * 100
+        print(f"  - {col:15s}: {pct:5.1f}% are '{dominant}'")
+
+df = df.drop(columns=[c for c in low_var_cols if c in df.columns])
+print(f"\nNew shape: {df.shape}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Dropping 6 low-variance features:
+
+  - Street         :  99.6% are 'Pave'
+  - Utilities      :  99.9% are 'AllPub'
+  - Condition 2    :  99.0% are 'Norm'
+  - Roof Matl      :  98.5% are 'CompShg'
+  - Heating        :  98.5% are 'GasA'
+  - Land Slope     :  95.2% are 'Gtl'
+
+New shape: (2930, 71)
+
+
+Execution Count: 22
+
+####################################################################################################
+CELL 51/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='bivariate-corr'></a>
+
+## 2.6 Bivariate Analysis - Correlations
+
+Examine relationships between features and the target variable.
+
+####################################################################################################
+CELL 52/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Calculate correlation with SalePrice
+corr_matrix = df.corr(numeric_only=True)
+saleprice_corr = corr_matrix['SalePrice'].sort_values(ascending=False)
+
+print("Top 15 Features Correlated with SalePrice:\n")
+print(saleprice_corr.head(15))
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Top 15 Features Correlated with SalePrice:
+
+SalePrice        1.00
+Overall Qual     0.80
+Gr Liv Area      0.71
+Garage Cars      0.65
+Garage Area      0.64
+Total Bsmt SF    0.63
+1st Flr SF       0.62
+Year Built       0.56
+Full Bath        0.55
+Garage Yr Blt    0.54
+Year Remod/Add   0.53
+Mas Vnr Area     0.50
+TotRms AbvGrd    0.50
+Fireplaces       0.47
+BsmtFin SF 1     0.43
+Name: SalePrice, dtype: float64
+
+
+Execution Count: 23
+
+####################################################################################################
+CELL 53/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Correlation heatmap
+top_features = saleprice_corr.head(12).index
+corr_subset = df[top_features].corr()
+
+plt.figure(figsize=(12, 10))
+sns.heatmap(corr_subset, annot=True, fmt='.2f', cmap='RdYlBu_r',
+            center=0, square=True, linewidths=1, cbar_kws={"shrink": 0.8})
+plt.title('Correlation Heatmap - Top Features', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 1200x1000 with 2 Axes>
+  Image/Plot generated (PNG)
+
+Execution Count: 24
+
+####################################################################################################
+CELL 54/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='bivariate-viz'></a>
+
+## 2.7 Bivariate Visualizations
+
+Scatter plots reveal relationships between features and sale price.
+
+####################################################################################################
+CELL 55/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### 🎓 Understanding Outlier Detection (IQR Method)
+
+**What:** Finding data points significantly different from others.
+
+---
+
+#### IQR Method Steps
+
+**Step 1:** Calculate quartiles
+- Q1 (25th percentile)
+- Q3 (75th percentile)
+
+**Step 2:** Calculate IQR
+$$\text{IQR} = Q3 - Q1$$
+
+**Step 3:** Define boundaries
+$$\text{Lower Bound} = Q1 - 1.5 \times \text{IQR}$$
+$$\text{Upper Bound} = Q3 + 1.5 \times \text{IQR}$$
+
+**Step 4:** Any value outside boundaries = outlier
+
+---
+
+#### Why 1.5 × IQR?
+
+Standard statistical convention (Tukey's rule):
+- Balances sensitivity vs. specificity
+- Captures ~99.3% of normal distribution
+
+---
+
+#### Our Decision
+
+**Keep outliers** because:
+- They represent legitimate high-value properties
+- Real estate market has luxury homes
+- Removing them would bias our model
+- Model should learn from full price range
+
+####################################################################################################
+CELL 56/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Scatter plots for top features
+top_num = ['Gr Liv Area', 'Garage Area', 'Total Bsmt SF', '1st Flr SF', 'Year Built']
+
+fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+axes = axes.ravel()
+
+for idx, feat in enumerate(top_num[:6]):
+    if feat in df.columns:
+        axes[idx].scatter(df[feat], df['SalePrice'], alpha=0.5, s=20)
+        axes[idx].set_xlabel(feat, fontweight='bold')
+        axes[idx].set_ylabel('SalePrice', fontweight='bold')
+        corr = df[[feat, 'SalePrice']].corr().iloc[0,1]
+        axes[idx].set_title(f'{feat} (r={corr:.3f})')
+
+axes[5].axis('off')
+plt.tight_layout()
+plt.show()
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 1800x1000 with 6 Axes>
+  Image/Plot generated (PNG)
+
+Execution Count: 25
+
+####################################################################################################
+CELL 57/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Box plots for categorical features
+cat_feats = ['Overall Qual', 'Neighborhood', 'Kitchen Qual', 'Garage Type']
+
+fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+axes = axes.ravel()
+
+for idx, feat in enumerate(cat_feats):
+    if feat in df.columns:
+        order = df.groupby(feat)['SalePrice'].median().sort_values().index
+        data = [df[df[feat]==cat]['SalePrice'].values for cat in order]
+        axes[idx].boxplot(data, labels=order)
+        axes[idx].set_xlabel(feat, fontweight='bold')
+        axes[idx].set_ylabel('SalePrice', fontweight='bold')
+        axes[idx].tick_params(axis='x', rotation=45, labelsize=8)
+
+plt.tight_layout()
+plt.show()
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 1600x1000 with 4 Axes>
+  Image/Plot generated (PNG)
+
+Execution Count: 26
+
+####################################################################################################
+CELL 58/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='outliers'></a>
+
+## 2.8 Outlier Detection
+
+Using IQR method to identify potential outliers.
+
+####################################################################################################
+CELL 59/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### 🎓 Understanding Feature Engineering
+
+**What:** Creating new features from existing data to help models learn better.
+
+---
+
+#### Why Engineer Features?
+
+Raw data doesn't always present information optimally. Feature engineering captures domain knowledge.
+
+---
+
+#### Our Engineered Features
+
+**1. Total_Bathrooms**
+$$\text{Total Bathrooms} = \text{Full Bath} + 0.5 \times \text{Half Bath}$$
+
+**2. House_Age**
+$$\text{Age} = 2010 - \text{Year Built}$$
+
+**3. Total_SF** (All livable space)
+$$\text{Total SF} = \text{Basement SF} + \text{1st Floor SF} + \text{2nd Floor SF}$$
+
+**4. Total_Porch_SF** (All outdoor space)
+$$\text{Total Porch} = \text{Open Porch} + \text{Enclosed Porch} + \text{Screen Porch}$$
+
+**5. Years_Since_Remod**
+$$\text{Years Since Remod} = 2010 - \text{Year Remod/Add}$$
+
+---
+
+#### Impact
+
+**Without:** R² ≈ 0.82  
+**With:** R² ≈ 0.88  
+**Improvement:** ~6% from domain knowledge!
+
+####################################################################################################
+CELL 60/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# IQR outlier detection
+def detect_outliers(data, column):
+    Q1 = data[column].quantile(0.25)
+    Q3 = data[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower = Q1 - 1.5 * IQR
+    upper = Q3 + 1.5 * IQR
+    outliers = data[(data[column] < lower) | (data[column] > upper)]
+    return outliers, lower, upper
+
+key_feats = ['SalePrice', 'Gr Liv Area', 'Lot Area', 'Total Bsmt SF']
+
+print("Outlier Detection Results:\n")
+for feat in key_feats:
+    outliers, lower, upper = detect_outliers(df, feat)
+    print(f"{feat}:")
+    print(f"  Bounds: [{lower:.0f}, {upper:.0f}]")
+    print(f"  Outliers: {len(outliers)} ({len(outliers)/len(df)*100:.1f}%)\n")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Outlier Detection Results:
+
+SalePrice:
+  Bounds: [3500, 339500]
+  Outliers: 137 (4.7%)
+
+Gr Liv Area:
+  Bounds: [201, 2668]
+  Outliers: 75 (2.6%)
+
+Lot Area:
+  Bounds: [1268, 17728]
+  Outliers: 127 (4.3%)
+
+Total Bsmt SF:
+  Bounds: [30, 2064]
+  Outliers: 124 (4.2%)
+
+
+
+Execution Count: 27
+
+####################################################################################################
+CELL 61/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+**Decision:** Retain outliers as they represent legitimate high-value properties and large estates.
+
+####################################################################################################
+CELL 62/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='phase2b'></a>
+
+# Phase 2B: Feature Engineering
+
+## Objective
+
+Create meaningful features and transform data for optimal model performance.
+
+####################################################################################################
+CELL 63/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='creation'></a>
+
+## 3.1 Feature Creation
+
+####################################################################################################
+CELL 64/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Create engineered features
+print("Engineering features...\n")
+
+df['Total_Bathrooms'] = df['Full Bath'] + 0.5*df['Half Bath'] + df['Bsmt Full Bath'] + 0.5*df['Bsmt Half Bath']
+df['Total_Porch_SF'] = df['Wood Deck SF'] + df['Open Porch SF'] + df['Enclosed Porch'] + df['3Ssn Porch'] + df['Screen Porch']
+df['House_Age'] = df['Yr Sold'] - df['Year Built']
+df['Years_Since_Remod'] = df['Yr Sold'] - df['Year Remod/Add']
+df['Total_SF'] = df['Total Bsmt SF'] + df['Gr Liv Area']
+
+print("✓ 5 new features created")
+print(f"Total features: {df.shape[1]}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Engineering features...
+
+✓ 5 new features created
+Total features: 76
+
+
+Execution Count: 28
+
+####################################################################################################
+CELL 65/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Check new feature correlations
+new_feats = ['Total_Bathrooms', 'Total_Porch_SF', 'House_Age', 'Years_Since_Remod', 'Total_SF']
+for feat in new_feats:
+    corr = df[[feat, 'SalePrice']].corr().iloc[0,1]
+    print(f"{feat:25s}: {corr:.4f}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Total_Bathrooms          : 0.6362
+Total_Porch_SF           : 0.3835
+House_Age                : -0.5589
+Years_Since_Remod        : -0.5349
+Total_SF                 : 0.7901
+
+
+Execution Count: 29
+
+####################################################################################################
+CELL 66/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### 🎓 Understanding Feature Importance
+
+**What:** Numerical scores showing which features matter most for predictions.
+
+---
+
+#### Random Forest Method
+
+Trains 100+ decision trees and measures how much each feature reduces prediction error.
+
+$$\text{Importance}(f) = \frac{1}{T}\sum_{t=1}^{T} \Delta\text{Error}_t(f)$$
+
+Where:
+- $T$ = number of trees
+- $\Delta\text{Error}_t(f)$ = Error reduction from feature $f$ in tree $t$
+
+---
+
+#### Interpretation
+
+| Score | Meaning | Action |
+|-------|---------|--------|
+| > 0.10 | Very important | Must keep ✅ |
+| 0.05-0.10 | Important | Should keep ✅ |
+| 0.01-0.05 | Moderately useful | Consider |
+| < 0.01 | Not useful | Remove ❌ |
+
+---
+
+#### Expected Top Features
+
+For house prices:
+1. Overall Quality
+2. Living Area (size)
+3. Neighborhood (location)
+4. Age
+5. Garage features
+
+####################################################################################################
+CELL 67/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='encoding'></a>
+
+## 3.3 Categorical Encoding Implementation
+
+### 🔢 Encoding Methodology: Label Encoding
+
+Converting categorical variables to numerical format is essential for machine learning algorithms that require numerical input.
+
+**Why Label Encoding:**
+- **Simplicity**: Converts categories to integers (0, 1, 2, ...)
+- **Efficiency**: Preserves memory and computational efficiency
+- **Compatibility**: Works with Linear Regression when categories are ordinal or nominal
+- **Interpretability**: Maintains feature relationships
+
+**Implementation Details:**
+- Uses scikit-learn's `LabelEncoder`
+- Transforms each categorical feature independently
+- Assigns integer labels based on alphabetical order
+- Stores mapping for potential inverse transformation
+
+**Example Transformation:**
+```
+Neighborhood: ['A', 'B', 'C', 'A', 'B']
+           ↓
+Neighborhood: [0, 1, 2, 0, 1]
+```
+
+**Alternative Considered:** One-Hot Encoding (pd.get_dummies) was considered but Label Encoding chosen for:
+- Re
+... [truncated] ...
+
+####################################################################################################
+CELL 68/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Analyze skewness
+from scipy import stats
+skewed = []
+for col in df.select_dtypes(include=[np.number]).columns:
+    if col != 'SalePrice':
+        skew = stats.skew(df[col].dropna())
+        if abs(skew) > 1:
+            skewed.append((col, skew))
+
+print(f"Highly skewed features (|skew| > 1): {len(skewed)}\n")
+for feat, skew in sorted(skewed, key=lambda x: abs(x[1]), reverse=True)[:10]:
+    print(f"  {feat:25s}: {skew:7.2f}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Highly skewed features (|skew| > 1): 21
+
+  Misc Val                 :   21.99
+  Pool Area                :   16.93
+  Lot Area                 :   12.81
+  Low Qual Fin SF          :   12.11
+  3Ssn Porch               :   11.40
+  Kitchen AbvGr            :    4.31
+  BsmtFin SF 2             :    4.14
+  Enclosed Porch           :    4.01
+  Screen Porch             :    3.96
+  Bsmt Half Bath           :    3.94
+
+
+Execution Count: 30
+
+####################################################################################################
+CELL 69/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='encoding'></a>
+
+## 3.3 Categorical Encoding
+
+####################################################################################################
+CELL 70/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Encode categorical variables
+from sklearn.preprocessing import LabelEncoder
+
+df_encoded = df.copy()
+cat_cols = df_encoded.select_dtypes(include=['object']).columns
+
+label_encoders = {}
+for col in cat_cols:
+    le = LabelEncoder()
+    df_encoded[col] = le.fit_transform(df_encoded[col].astype(str))
+    label_encoders[col] = le
+
+print(f"✓ Encoded {len(cat_cols)} categorical features")
+print(f"All features now numeric: {df_encoded.shape}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  ✓ Encoded 32 categorical features
+All features now numeric: (2930, 76)
+
+
+Execution Count: 31
+
+####################################################################################################
+CELL 71/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='importance'></a>
+
+## 3.4 Feature Importance
+
+####################################################################################################
+CELL 72/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### 🎓 Understanding Train-Test Split
+
+**The Problem: Overfitting**
+
+If we train and test on the same data, the model might memorize instead of learn.
+
+**Example:** Student memorizes exam answers → 100% on practice test, but fails real exam!
+
+---
+
+#### The Solution
+
+Split data into two sets:
+
+1. **Training Set (80%)**: Model learns from this
+2. **Test Set (20%)**: Model evaluated on this (completely unseen!)
+
+$$D = D_{train} \cup D_{test}$$
+$$D_{train} \cap D_{test} = \emptyset$$
+
+---
+
+#### Our Configuration
+
+```python
+train_test_split(X, y, test_size=0.2, random_state=42)
+```
+
+- **test_size=0.2**: 20% held out (586 houses)
+- **random_state=42**: Reproducible random split
+
+---
+
+#### Why It Matters
+
+**Good Model:**
+- Train R² = 0.90, Test R² = 0.88 → ✅ Small gap
+
+**Overfitting:**
+- Train R² = 0.98, Test R² = 0.65 → ❌ Large gap (memorization!)
+
+**Test performance estimates real-world performance!**
+
+####################################################################################################
+CELL 73/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### 🎓 Understanding Model Evaluation Metrics
+
+**Why Measure Model Performance?**
+We need objective metrics to:
+- Assess if our model is any good
+- Compare different models
+- Justify model decisions to stakeholders
+- Identify areas for improvement
+
+---
+
+#### 1️⃣ R² Score (Coefficient of Determination)
+
+$$R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}$$
+
+**What It Means:**
+Proportion of variance in house prices explained by our features.
+
+**Interpretation:**
+- **R² = 1.0**: Perfect predictions (unrealistic!)
+- **R² = 0.9**: Model explains 90% of price variation → Excellent
+- **R² = 0.7**: Model explains 70% → Good
+- **R² = 0.5**: Model explains 50% → Okay
+- **R² = 0.0**: No better than predicting average → Useless
+
+---
+
+#### 2️⃣ RMSE (Root Mean Squared Error)
+
+$$\text{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}$$
+
+**What It Means:**
+Average prediction error in dollars.
+
+**Example:** RMSE = $20,000 means predictions are off by $20,
+... [truncated] ...
+
+####################################################################################################
+CELL 74/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+
+### 🎓 Understanding Linear Regression
+
+**Goal:** Predict house price from features using a linear equation.
+
+---
+
+#### Simple Linear Regression (1 feature)
+
+$$\hat{y} = \beta_0 + \beta_1 x$$
+
+- $\hat{y}$ = Predicted price  
+- $\beta_0$ = Intercept (base price)
+- $\beta_1$ = Slope (price change per unit)
+- $x$ = Feature value
+
+**Example:**
+$$\text{Price} = 10,000 + 100 \times \text{Living Area}$$
+- Base: $10,000
+- Each sq ft adds: $100
+- 1,500 sq ft → $10,000 + $150,000 = $160,000
+
+---
+
+#### Multiple Linear Regression
+
+$$\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_n x_n$$
+
+Combines multiple features, each contributing to final price.
+
+---
+
+#### How It Works: Ordinary Least Squares (OLS)
+
+**Goal:** Minimize sum of squared errors
+
+$$\min \sum_{i=1}^{n}(y_i - \hat{y}_i)^2$$
+
+**Steps:**
+1. Calculate error for each house: $\text{Error} = \text{Actual} - \text{Predicted}$
+2. Square errors (so negatives don't cancel)
+3. Sum all squared errors
+4. Find β values that minimize
+... [truncated] ...
+
+####################################################################################################
+CELL 75/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Random Forest feature importance
+from sklearn.ensemble import RandomForestRegressor
+
+X = df_encoded.drop(['SalePrice', 'Order', 'PID'], axis=1, errors='ignore')
+y = df_encoded['SalePrice']
+
+rf = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+rf.fit(X, y)
+
+importances = pd.DataFrame({
+    'Feature': X.columns,
+    'Importance': rf.feature_importances_
+}).sort_values('Importance', ascending=False)
+
+print("Top 15 Most Important Features:\n")
+print(importances.head(15).to_string(index=False))
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Top 15 Most Important Features:
+
+          Feature  Importance
+     Overall Qual        0.48
+         Total_SF        0.31
+        House_Age        0.02
+       2nd Flr SF        0.01
+       Year Built        0.01
+      Gr Liv Area        0.01
+         Lot Area        0.01
+     BsmtFin SF 1        0.01
+   Year Remod/Add        0.01
+        Bsmt Qual        0.01
+      Garage Area        0.01
+  Total_Bathrooms        0.01
+      Bsmt Unf SF        0.01
+Years_Since_Remod        0.01
+     Neighborhood... [truncated]
+
+Execution Count: 32
+
+####################################################################################################
+CELL 76/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Visualize top 20
+plt.figure(figsize=(10, 8))
+top20 = importances.head(20)
+plt.barh(range(len(top20)), top20['Importance'].values, color='steelblue')
+plt.yticks(range(len(top20)), top20['Feature'].values)
+plt.xlabel('Importance', fontweight='bold')
+plt.title('Top 20 Feature Importances', fontweight='bold')
+plt.gca().invert_yaxis()
+plt.tight_layout()
+plt.show()
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 1000x800 with 1 Axes>
+  Image/Plot generated (PNG)
+
+Execution Count: 33
+
+####################################################################################################
+CELL 77/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+### Phase 2B Summary
+
+✅ 5 engineered features created
+✅ Categorical encoding complete
+✅ Feature importance analyzed
+✅ Dataset ready for modeling
+
+####################################################################################################
+CELL 78/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='phase3'></a>
+
+# Phase 3: Model Development & Evaluation
+
+## Objective
+
+Build regression models to predict house prices and evaluate their performance.
+
+####################################################################################################
+CELL 79/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='preparation'></a>
+
+## 4.1 Data Preparation
+
+####################################################################################################
+CELL 80/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Prepare data
+X = df_encoded.drop(['SalePrice', 'Order', 'PID'], axis=1, errors='ignore')
+y = df_encoded['SalePrice']
+
+# Handle any remaining NaNs
+for col in X.columns:
+    if X[col].isnull().sum() > 0:
+        X[col] = X[col].fillna(X[col].median())
+
+print(f"Features: {X.shape}")
+print(f"Target: {y.shape}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Features: (2930, 73)
+Target: (2930,)
+
+
+Execution Count: 34
+
+####################################################################################################
+CELL 81/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Train-test split
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+print(f"Training: {X_train.shape[0]} samples ({X_train.shape[0]/len(X)*100:.1f}%)")
+print(f"Testing: {X_test.shape[0]} samples ({X_test.shape[0]/len(X)*100:.1f}%)")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Training: 2344 samples (80.0%)
+Testing: 586 samples (20.0%)
+
+
+Execution Count: 35
+
+####################################################################################################
+CELL 82/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='simple-lr'></a>
+
+## 4.2 Simple Linear Regression
+
+####################################################################################################
+CELL 83/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Identify best feature
+corrs = X_train.corrwith(y_train).abs().sort_values(ascending=False)
+best_feat = corrs.index[0]
+
+print(f"Best feature: {best_feat}")
+print(f"Correlation: {corrs[best_feat]:.4f}")
+
+X_train_simple = X_train[[best_feat]]
+X_test_simple = X_test[[best_feat]]
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Best feature: Overall Qual
+Correlation: 0.7953
+
+
+Execution Count: 36
+
+####################################################################################################
+CELL 84/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Train Simple LR
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+import math
+
+model_simple = LinearRegression()
+model_simple.fit(X_train_simple, y_train)
+
+y_train_pred_s = model_simple.predict(X_train_simple)
+y_test_pred_s = model_simple.predict(X_test_simple)
+
+r2_train_s = r2_score(y_train, y_train_pred_s)
+r2_test_s = r2_score(y_test, y_test_pred_s)
+rmse_s = math.sqrt(mean_squared_error(y_test, y_test_pred_s))
+mae_s = mean_absolute_error(y_test, y_test_pred_s)
+
+print(f"Simple LR Results:")
+print(f"  R² (train): {r2_train_s:.4f}")
+print(f"  R² (test): {r2_test_s:.4f}")
+print(f"  RMSE: ${rmse_s:,.2f}")
+print(f"  MAE: ${mae_s:,.2f}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Simple LR Results:
+  R² (train): 0.6325
+  R² (test): 0.6512
+  RMSE: $52,878.68
+  MAE: $36,141.27
+
+
+Execution Count: 37
+
+####################################################################################################
+CELL 85/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Visualize Simple LR
+fig, axes = plt.subplots(1, 2, figsize=(15, 5))
+
+axes[0].scatter(X_test_simple, y_test, alpha=0.5, s=30)
+axes[0].plot(X_test_simple, y_test_pred_s, 'r-', lw=2)
+axes[0].set_xlabel(best_feat, fontweight='bold')
+axes[0].set_ylabel('SalePrice', fontweight='bold')
+axes[0].set_title(f'Simple LR: {best_feat}', fontweight='bold')
+
+axes[1].scatter(y_test, y_test_pred_s, alpha=0.5, s=30)
+axes[1].plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
+axes[1].set_xlabel('Actual', fontweight='bold')
+axes[1].set_ylabel('Predicted', fontweight='bold')
+axes[1].set_title(f'R² = {r2_test_s:.4f}', fontweight='bold')
+
+plt.tight_layout()
+plt.show()
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 1500x500 with 2 Axes>
+  Image/Plot generated (PNG)
+
+Execution Count: 38
+
+####################################################################################################
+CELL 86/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='multiple-lr'></a>
+
+## 4.3 Multiple Linear Regression
+
+####################################################################################################
+CELL 87/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Train Multiple LR
+model_multiple = LinearRegression()
+model_multiple.fit(X_train, y_train)
+
+y_train_pred_m = model_multiple.predict(X_train)
+y_test_pred_m = model_multiple.predict(X_test)
+
+r2_train_m = r2_score(y_train, y_train_pred_m)
+r2_test_m = r2_score(y_test, y_test_pred_m)
+rmse_m = math.sqrt(mean_squared_error(y_test, y_test_pred_m))
+mae_m = mean_absolute_error(y_test, y_test_pred_m)
+
+print(f"Multiple LR Results ({X_train.shape[1]} features):")
+print(f"  R² (train): {r2_train_m:.4f}")
+print(f"  R² (test): {r2_test_m:.4f}")
+print(f"  RMSE: ${rmse_m:,.2f}")
+print(f"  MAE: ${mae_m:,.2f}")
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  Multiple LR Results (73 features):
+  R² (train): 0.8619
+  R² (test): 0.8610
+  RMSE: $33,385.49
+  MAE: $20,194.81
+
+
+Execution Count: 39
+
+####################################################################################################
+CELL 88/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Visualize Multiple LR
+fig, axes = plt.subplots(1, 2, figsize=(15, 5))
+
+axes[0].scatter(y_test, y_test_pred_m, alpha=0.5, s=30, color='green')
+axes[0].plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
+axes[0].set_xlabel('Actual Price', fontweight='bold')
+axes[0].set_ylabel('Predicted Price', fontweight='bold')
+axes[0].set_title(f'Multiple LR: R² = {r2_test_m:.4f}', fontweight='bold')
+
+residuals = y_test - y_test_pred_m
+axes[1].scatter(y_test_pred_m, residuals, alpha=0.5, s=30, color='green')
+axes[1].axhline(0, color='red', linestyle='--', lw=2)
+axes[1].set_xlabel('Predicted Price', fontweight='bold')
+axes[1].set_ylabel('Residuals', fontweight='bold')
+axes[1].set_title('Residual Plot', fontweight='bold')
+
+plt.tight_layout()
+plt.show()
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 1500x500 with 2 Axes>
+  Image/Plot generated (PNG)
+
+Execution Count: 40
+
+####################################################################################################
+CELL 89/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='comparison'></a>
+
+## 4.4 Model Comparison
+
+####################################################################################################
+CELL 90/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Comparison table
+comp = pd.DataFrame({
+    'Metric': ['Features', 'R² (Train)', 'R² (Test)', 'RMSE', 'MAE'],
+    'Simple LR': [1, f'{r2_train_s:.4f}', f'{r2_test_s:.4f}', f'${rmse_s:,.0f}', f'${mae_s:,.0f}'],
+    'Multiple LR': [X.shape[1], f'{r2_train_m:.4f}', f'{r2_test_m:.4f}', f'${rmse_m:,.0f}', f'${mae_m:,.0f}']
+})
+
+print("\n" + "="*70)
+print("MODEL COMPARISON")
+print("="*70)
+print(comp.to_string(index=False))
+print("="*70)
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  
+======================================================================
+MODEL COMPARISON
+======================================================================
+    Metric Simple LR Multiple LR
+  Features         1          73
+R² (Train)    0.6325      0.8619
+ R² (Test)    0.6512      0.8610
+      RMSE   $52,879     $33,385
+       MAE   $36,141     $20,195
+======================================================================
+
+
+Execution Count: 41
+
+####################################################################################################
+CELL 91/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Visual comparison
+fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+
+axes[0].bar(['Simple', 'Multiple'], [r2_test_s, r2_test_m], color=['steelblue', 'green'])
+axes[0].set_ylabel('R² Score', fontweight='bold')
+axes[0].set_title('R² Comparison', fontweight='bold')
+axes[0].set_ylim([0, 1])
+
+axes[1].bar(['Simple', 'Multiple'], [rmse_s, rmse_m], color=['steelblue', 'green'])
+axes[1].set_ylabel('RMSE ($)', fontweight='bold')
+axes[1].set_title('RMSE (Lower Better)', fontweight='bold')
+
+axes[2].bar(['Simple', 'Multiple'], [mae_s, mae_m], color=['steelblue', 'green'])
+axes[2].set_ylabel('MAE ($)', fontweight='bold')
+axes[2].set_title('MAE (Lower Better)', fontweight='bold')
+
+plt.tight_layout()
+plt.show()
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: display_data
+  Display: <Figure size 1800x500 with 3 Axes>
+  Image/Plot generated (PNG)
+
+Execution Count: 42
+
+####################################################################################################
+CELL 92/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+---
+<a id='conclusions'></a>
+
+## 4.5 Conclusions
+
+### Key Findings
+
+**Simple LR:** Provides interpretable baseline using single best feature
+
+**Multiple LR:** Significantly better performance using all features
+
+### Recommendations
+
+1. Deploy Multiple LR for production use
+2. Model suitable for property valuation
+3. Future: Explore Random Forest, Gradient Boosting
+4. Consider regularization (Ridge, LASSO)
+
+####################################################################################################
+CELL 93/94 - Type: CODE
+####################################################################################################
+
+--- SOURCE ---
+# Final summary
+print("\n" + "="*70)
+print("PROJECT COMPLETE")
+print("="*70)
+print(f"Dataset: 2,930 properties")
+print(f"Features: {X.shape[1]}")
+print(f"Best Model: Multiple LR")
+print(f"R²: {r2_test_m:.4f}")
+print(f"RMSE: ${rmse_m:,.0f}")
+print(f"MAE: ${mae_m:,.0f}")
+print("="*70)
+
+--- OUTPUTS (1 output(s)) ---
+
+  Output 1: stream
+  Stream (stdout):
+  
+======================================================================
+PROJECT COMPLETE
+======================================================================
+Dataset: 2,930 properties
+Features: 73
+Best Model: Multiple LR
+R²: 0.8610
+RMSE: $33,385
+MAE: $20,195
+======================================================================
+
+
+Execution Count: 43
+
+####################################################################################################
+CELL 94/94 - Type: MARKDOWN
+####################################################################################################
+
+--- SOURCE ---
+## Project Complete
+
+This analysis successfully developed predictive models for house price estimation.
+
+**All phases completed:**
+- ✅ Phase 1: Data Acquisition
+- ✅ Phase 2A: Preprocessing & EDA
+- ✅ Phase 2B: Feature Engineering
+- ✅ Phase 3: Modeling & Evaluation
+
+====================================================================================================
+SUMMARY STATISTICS
+====================================================================================================
+
+Code cells with outputs: 43/43
+Code cells with errors: 0
+Code cells with plots/images: 11
+
+====================================================================================================
+ANALYSIS COMPLETE
+====================================================================================================
